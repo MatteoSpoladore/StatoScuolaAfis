@@ -496,7 +496,7 @@ def compute_totals(
 # RENDER: DASHBOARD e TABELLE
 # ----------------------------
 def render_dashboard(totals):
-    st.subheader("💡 Riepilogo rapido")
+    st.subheader("💡 Riepilogo rapido (un trimestre)")
     cols = st.columns(5)
     cols[0].metric("💰 Ricavi totali", f"€ {totals['total_revenue']:,.0f}")
     cols[1].metric("🧾 Totale costi", f"€ {totals['total_costs']:,.0f}")
@@ -505,6 +505,19 @@ def render_dashboard(totals):
     )
     cols[3].metric("⏱️ Ore totali (settimanali)", f"{totals['total_week_hours']:.2f} h")
     cols[4].metric("📊 Saturazione", f"{totals['saturation']:.2f} %")
+
+
+def render_dashboard_anno(totals):
+    st.subheader("💡 Riepilogo rapido (anno scolastico senza variazioni)")
+    cols = st.columns(5)
+    cols[0].metric("💰 Ricavi totali", f"€ {3*totals['total_revenue']:,.0f}")
+    cols[1].metric("🧾 Totale costi", f"€ {3*totals['total_costs']:,.0f}")
+    cols[2].metric(
+        "📉 Ricavi - Costi",
+        f"€ {3*totals['total_revenue'] - 3*totals['total_costs']:,.0f}",
+    )
+    # cols[3].metric("⏱️ Ore totali ", f"{3*totals['total_week_hours']:.2f} h")
+    # cols[4].metric("📊 Saturazione", f"{totals['saturation']:.2f} %")
 
 
 def render_detail_table(totals):
@@ -789,6 +802,7 @@ with col_left:
 
 
 render_dashboard(tot_10)
+render_dashboard_anno(tot_10)
 
 # -----------------------------
 # RIEPILOGO CLASSI e DETTAGLIO
