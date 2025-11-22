@@ -4,8 +4,110 @@ import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
 from math import ceil
+import os
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+from dotenv import load_dotenv
+
+load_dotenv()  # carica tutte le variabili da .env
+
+CREDS_PATH = os.getenv("CREDS_PATH")
+SPREADSHEET_NAME = os.getenv("SPREADSHEET_NAME")
+SHEET_NAME = os.getenv("SHEET_NAME")
+ROWS = (1, 13)  # zero-based: start inclusive, end exclusive (es. righe 2-13)
+COLS = (7, 10)  # zero-based: colonne H-J (start inclusive, end exclusive)
+COL_NAMES = ["Durata", "Corso", "Iscritti"]
+# ----------------------------
+# CONNESSIONE A FOGLI GOOGLE
+# ----------------------------
+
+# Connessione e lettura
+scope = [
+    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/drive",
+]
+creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_PATH, scope)
+client = gspread.authorize(creds)
+sheet = client.open(SPREADSHEET_NAME).worksheet(SHEET_NAME)
+values = sheet.get_all_values()
+df = pd.DataFrame(values)
+
+# Estraggo la porzione indicata
+chunk = df.iloc[ROWS[0] : ROWS[1], COLS[0] : COLS[1]].copy()
+chunk.columns = COL_NAMES[: chunk.shape[1]]
 
 
+def safe_int(x):
+    try:
+        if x is None:
+            return None
+        s = str(x).strip()
+        if s == "":
+            return None
+        return int(float(s))
+    except:
+        return None
+
+
+# Costruisco default_enrollments con chiavi tuple
+default_enrollments = {}
+for _, r in chunk.iterrows():
+    d = safe_int(r.get("Durata"))
+    c = (r.get("Corso") or "").strip()
+    n = safe_int(r.get("Iscritti"))
+    if d is not None and c != "" and n is not None:
+        default_enrollments[(d, c)] = n
+
+
+#################################SPECIALS#############################################
+# ----------------------------
+# COORDINATE per specials dal .env o fisse
+# ----------------------------
+SPECIAL_ROWS = (0, 5)  # righe 1-5 nel foglio → 0-based
+SPECIAL_COLS = (11, 15)  # colonne L-O → 0-based
+
+# Nomi colonne
+SPECIAL_COL_NAMES = ["Corso", "Studenti", "Durata", "Prezzo"]
+
+# Estraggo la porzione
+special_chunk = df.iloc[
+    SPECIAL_ROWS[0] : SPECIAL_ROWS[1], SPECIAL_COLS[0] : SPECIAL_COLS[1]
+].copy()
+special_chunk.columns = SPECIAL_COL_NAMES[: special_chunk.shape[1]]
+
+
+# Funzione safe int già definita
+def safe_float(x):
+    try:
+        s = str(x).strip()
+        if s == "":
+            return None
+        return float(s)
+    except:
+        return None
+
+
+# Costruisco defaults_specials
+defaults_specials = {}
+for _, r in special_chunk.iterrows():
+    corso = (r.get("Corso") or "").strip()
+    students = safe_int(r.get("Studenti"))
+    duration = safe_int(r.get("Durata")) or 60  # default se vuoi
+    price = safe_float(r.get("Prezzo")) or 100  # default se vuoi
+
+    if corso != "" and students is not None:
+        defaults_specials[corso] = {
+            "students": students,
+            "duration": duration,
+            "price": price,
+        }
+
+
+# ----------------------------
+# FINE CONNESSIONE
+# ----------------------------
+
+# st.code("default_enrollments = " + repr(defaults_specials), language="python")
 # ----------------------------
 # CONFIGURAZIONE PAGINA / COSTANTI
 # ----------------------------
@@ -49,27 +151,28 @@ PRICE_TABLE = {
 DEFAULT_PRICES_BY_MIN = {30: 120.0, 45: 180.0, 60: 240.0}
 LESSONS_PER_PACKAGE = 10
 
-default_enrollments = {
-    (30, "solo_fiato"): 1,
-    (30, "fiato_solf"): 12,
-    (30, "solo_arco"): 0,
-    (30, "arco_solf"): 13,
-    (45, "solo_fiato"): 9,
-    (45, "fiato_solf"): 16,
-    (45, "solo_arco"): 11,
-    (45, "arco_solf"): 11,
-    (60, "solo_fiato"): 8,
-    (60, "fiato_solf"): 4,
-    (60, "solo_arco"): 10,
-    (60, "arco_solf"): 2,
-}
+# default_enrollments = {
+#     (30, "solo_fiato"): 1,
+#     (30, "fiato_solf"): 12,
+#     (30, "solo_arco"): 0,
+#     (30, "arco_solf"): 13,
+#     (45, "solo_fiato"): 9,
+#     (45, "fiato_solf"): 16,
+#     (45, "solo_arco"): 11,
+#     (45, "arco_solf"): 11,
+#     (60, "solo_fiato"): 8,
+#     (60, "fiato_solf"): 4,
+#     (60, "solo_arco"): 10,
+#     (60, "arco_solf"): 2,
+# }
 
-defaults_specials = {
-    "prop": {"students": 0, "duration": 60, "price": 100},
-    "svil": {"students": 5, "duration": 45, "price": 80},
-    "fasce": {"students": 0, "duration": 30, "price": 80},
-    "solo_solfeggio": {"students": 12, "duration": 60, "price": 100},
-}
+# defaults_specials = {
+#     "prop": {"students": 0, "duration": 60, "price": 100},
+#     "svil": {"students": 5, "duration": 45, "price": 80},
+#     "fasce": {"students": 0, "duration": 30, "price": 80},
+#     "solo_solfeggio": {"students": 12, "duration": 60, "price": 100},
+# }
+
 
 # ----------------------------
 # FUNZIONI UTILI
