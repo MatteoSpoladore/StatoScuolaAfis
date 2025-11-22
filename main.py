@@ -182,6 +182,27 @@ LESSONS_PER_PACKAGE = 10
 #     (60, "solo_arco"): 10,
 #     (60, "arco_solf"): 2,
 # }
+# default_enrollments = {
+#     (30, "solo_fiato"): 1,
+#     (30, "fiato_solf"): 12,
+#     (30, "solo_arco"): 0,
+#     (30, "arco_solf"): 13,
+#     (45, "solo_fiato"): 9,
+#     (45, "fiato_solf"): 16,
+#     (45, "solo_arco"): 11,
+#     (45, "arco_solf"): 11,
+#     (60, "solo_fiato"): 8,
+#     (60, "fiato_solf"): 4,
+#     (60, "solo_arco"): 10,
+#     (60, "arco_solf"): 2,
+# }
+
+# defaults_specials = {
+#     "prop": {"students": 0, "duration": 60, "price": 100},
+#     "svil": {"students": 5, "duration": 45, "price": 80},
+#     "fasce": {"students": 0, "duration": 30, "price": 80},
+#     "solo_solfeggio": {"students": 12, "duration": 60, "price": 100},
+# }
 
 # defaults_specials = {
 #     "prop": {"students": 0, "duration": 60, "price": 100},
