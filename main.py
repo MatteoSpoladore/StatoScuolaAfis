@@ -784,7 +784,7 @@ max_val = max(ricavi, costi)
 fig_bar.update_yaxes(tickformat=",", range=[0, max_val + 5000])
 with col_left:
     st.plotly_chart(
-        fig_bar, config={"staticPlot": True, "displayModeBar": False}, width="stretch"
+        fig_bar, config={"staticPlot": True, "displayModeBar": True}, width="stretch"
     )
 
 
