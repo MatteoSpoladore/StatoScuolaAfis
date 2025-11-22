@@ -4,14 +4,15 @@ import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
 from math import ceil
-import os
+import os, json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from dotenv import load_dotenv
 
 load_dotenv()  # carica tutte le variabili da .env
 
-CREDS_PATH = os.getenv("CREDS_PATH")
+
+# CREDS_PATH = os.getenv("CREDS_PATH")
 SPREADSHEET_NAME = os.getenv("SPREADSHEET_NAME")
 SHEET_NAME = os.getenv("SHEET_NAME")
 ROWS = (1, 13)  # zero-based: start inclusive, end exclusive (es. righe 2-13)
@@ -26,7 +27,23 @@ scope = [
     "https://spreadsheets.google.com/feeds",
     "https://www.googleapis.com/auth/drive",
 ]
-creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_PATH, scope)
+
+
+# Provo a leggere il JSON dai secrets/cloud
+creds_json = os.getenv("GOOGLE_CREDS_JSON")
+
+if creds_json:
+    # Se esiste, siamo in cloud
+    creds_dict = json.loads(creds_json)
+    creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+else:
+    # Se non esiste, siamo in locale: carico dal file fisico
+    CREDS_PATH = "credenziali.json"
+    creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_PATH, scope)
+# creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_PATH, scope)
+# creds_dict = json.loads(creds_json)
+# creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open(SPREADSHEET_NAME).worksheet(SHEET_NAME)
 values = sheet.get_all_values()
