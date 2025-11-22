@@ -728,7 +728,7 @@ fig_semi = go.Figure(
             line=dict(color="white", width=1),
         ),
         textinfo="none",
-        hoverinfo="label+value",
+        hoverinfo="value",
         rotation=0,
     )
 )
@@ -782,7 +782,7 @@ fig_bar.update_layout(
 )
 max_val = max(ricavi, costi)
 fig_bar.update_yaxes(tickformat=",", range=[0, max_val + 5000])
-
+fig_bar.show(config={"staticPlot": True, "displayModeBar": True})
 with col_left:
     st.plotly_chart(fig_bar, width="stretch")
 
