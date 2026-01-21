@@ -259,7 +259,7 @@ def render_sidebar_settings():
     contributi = st.sidebar.number_input(
         "💰 Contributi accantonati (€)", 0, 20000, 0, step=500
     )
-    other_fixed_costs = st.sidebar.number_input(
+    costi_fissi = st.sidebar.number_input(
         "🏢 Altri costi fissi (€)", 0, 10000, 0, step=100
     )
     return (
@@ -267,7 +267,7 @@ def render_sidebar_settings():
         hourly_teacher_cost,
         total_available_hours,
         contributi,
-        other_fixed_costs,
+        costi_fissi,
     )
 
 
@@ -371,7 +371,7 @@ def compute_totals(
     min_students,
     hourly_teacher_cost,
     contributi,
-    other_fixed_costs,
+    costi_fissi,
     num_lessons=LESSONS_PER_PACKAGE,
 ):
     """
@@ -419,7 +419,7 @@ def compute_totals(
         )
 
     # aggiungo contributi (se presenti) ai ricavi netti
-    total_revenue += float(contributi or 0.0)
+    # total_revenue += float(contributi or 0.0)
 
     # Ore per pacchetto (moltiplicate per num_lessons)
     individual_hours = sum(
@@ -468,7 +468,7 @@ def compute_totals(
     special_costs = hourly_teacher_cost * other_class_hours
     teacher_cost = hourly_teacher_cost * (individual_hours + other_class_hours)
     solf_cost = hourly_teacher_cost * solfeggio_class_hours
-    total_costs = teacher_cost + solf_cost + other_fixed_costs
+    total_costs = teacher_cost + solf_cost# + other_fixed_costs
     deviation = total_revenue - total_costs
 
     saturation = (
@@ -507,13 +507,13 @@ def render_dashboard(totals):
     cols[4].metric("📊 Saturazione", f"{totals['saturation']:.2f} %")
 
 
-def render_dashboard_anno(totals, contributi):
+def render_dashboard_anno(totals, contributi , costi_fissi):
     st.subheader("💡 Riepilogo rapido (anno scolastico senza variazioni)")
 
     ricavi_annui = 3 * totals["total_revenue"]
     costi_annui = 3 * totals["total_costs"]
 
-    utile_annuo = ricavi_annui - costi_annui + contributi
+    utile_annuo = ricavi_annui - costi_annui + contributi - costi_fissi
     utile_nocontr = ricavi_annui - costi_annui
 
     cols = st.columns(5)
@@ -522,7 +522,8 @@ def render_dashboard_anno(totals, contributi):
     cols[2].metric("📉 Ricavi - costi", f"€ {utile_nocontr:,.0f}")
     cols[3].metric("📉 Risultato netto", f"€ {utile_annuo:,.0f}")
     cols[4].metric("💸 Contributi utilizzati", f"€ {contributi:,.0f}")
-
+    cols = st.columns(5)
+    cols[4].metric("🧾 Costi fissi", f"€ {costi_fissi:,.0f}")
 def render_detail_table(totals):
     st.subheader("📊 Tabella ricavi e costi per corsi individuali")
     with st.expander("🔎 dettagli ricavi, costi e saldo per corso", expanded=False):
@@ -692,7 +693,7 @@ def render_detail_table(totals):
     hourly_teacher_cost,
     total_available_hours,
     contributi,
-    other_fixed_costs,
+    costi_fissi,
 ) = render_sidebar_settings()
 enrollment_keys = render_input_iscritti(default_enrollments)
 specials_data = render_input_specials(defaults_specials)
@@ -709,7 +710,7 @@ tot_10 = compute_totals(
     min_students=min_students,
     hourly_teacher_cost=hourly_teacher_cost,
     contributi=contributi,
-    other_fixed_costs=other_fixed_costs,
+    costi_fissi=costi_fissi,
     num_lessons=LESSONS_PER_PACKAGE,
 )
 
@@ -805,7 +806,7 @@ with col_left:
 
 
 render_dashboard(tot_10)
-render_dashboard_anno(tot_10, contributi)
+render_dashboard_anno(tot_10, contributi,costi_fissi)
 
 # -----------------------------
 # RIEPILOGO CLASSI e DETTAGLIO
