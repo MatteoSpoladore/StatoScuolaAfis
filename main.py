@@ -513,14 +513,15 @@ def render_dashboard_anno(totals, contributi):
     ricavi_annui = 3 * totals["total_revenue"]
     costi_annui = 3 * totals["total_costs"]
 
-    utile_annuo = ricavi_annui - costi_annui - contributi
+    utile_annuo = ricavi_annui - costi_annui + contributi
+    utile_nocontr = ricavi_annui - costi_annui
 
     cols = st.columns(5)
     cols[0].metric("💰 Ricavi totali", f"€ {ricavi_annui:,.0f}")
     cols[1].metric("🧾 Totale costi", f"€ {costi_annui:,.0f}")
-    cols[2].metric("💸 Contributi", f"- € {contributi:,.0f}")
+    cols[2].metric("📉 Ricavi - costi", f"€ {utile_nocontr:,.0f}")
     cols[3].metric("📉 Risultato netto", f"€ {utile_annuo:,.0f}")
-
+    cols[4].metric("💸 Contributi utilizzati", f"€ {contributi:,.0f}")
 
 def render_detail_table(totals):
     st.subheader("📊 Tabella ricavi e costi per corsi individuali")
