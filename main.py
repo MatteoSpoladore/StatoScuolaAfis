@@ -522,8 +522,9 @@ def render_dashboard_anno(totals, contributi , costi_fissi):
     cols[2].metric("📉 Ricavi - costi", f"€ {utile_nocontr:,.0f}")
     cols[3].metric("📉 Risultato netto \n (+- contributi e costi fissi)", f"€ {utile_annuo:,.0f}")
     cols[4].metric("💸 Contributi utilizzati", f"€ {contributi:,.0f}")
+    st.subheader("💡 Risultato netto proiezione(+ contributi utilizzati | - costi fissi stimati )")
     cols = st.columns(5)
-    cols[2].metric("📉 Risultato netto \n (+- contributi e costi fissi)", f"€ {utile_annuo:,.0f}")
+    cols[2].metric("📉 Risultato netto", f"€ {utile_annuo:,.0f}")
     cols[0].metric("💸 Contributi utilizzati", f"€ {contributi:,.0f}")
     cols[1].metric("🧾 Costi fissi", f"€ {costi_fissi:,.0f}")
 def render_detail_table(totals):
