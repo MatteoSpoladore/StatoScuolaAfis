@@ -524,8 +524,8 @@ def render_dashboard_anno(totals, contributi , costi_fissi):
     cols[4].metric("💸 Contributi utilizzati", f"€ {contributi:,.0f}")
     cols = st.columns(5)
     cols[2].metric("📉 Risultato netto \n (+- contributi e costi fissi)", f"€ {utile_annuo:,.0f}")
-    cols[3].metric("💸 Contributi utilizzati", f"€ {contributi:,.0f}")
-    cols[4].metric("🧾 Costi fissi", f"€ {costi_fissi:,.0f}")
+    cols[0].metric("💸 Contributi utilizzati", f"€ {contributi:,.0f}")
+    cols[1].metric("🧾 Costi fissi", f"€ {costi_fissi:,.0f}")
 def render_detail_table(totals):
     st.subheader("📊 Tabella ricavi e costi per corsi individuali")
     with st.expander("🔎 dettagli ricavi, costi e saldo per corso", expanded=False):
